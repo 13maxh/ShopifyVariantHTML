@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolve IO Shopify Variants</title>
+    <!-- Add the link to the logo for the tab icon -->
+    <link rel="icon" type="image/png" href="https://media.discordapp.net/attachments/958186679003398184/1071632025812992071/Transparent_Logo.png?width=906&height=906">
+    <style>
+        /* CSS styles for formatting */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative; /* Added for positioning the copy button */
+        }
+
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .result {
+            font-size: 16px;
+            white-space: pre-line;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* Style for the logo */
+        .logo {
+            max-width: 100px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Style for the copy button */
+        #copyButton {
+            background-color: transparent;
+            color: #007bff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            Right: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://media.discordapp.net/attachments/958186679003398184/1071632025812992071/Transparent_Logo.png?width=906&height=906" alt="Shopify Variant Finder Logo" class="logo">
+        <h1 class="header">Evolve IO | Shopify Variants</h1>
+        <div class="input-group">
+            <input type="text" id="shopifyLink" placeholder="Enter Shopify link">
+            <button onclick="findVariants()">Find Variants</button>
+        </div>
+        <div class="result" id="variantResult"></div>
+        <button id="copyButton" onclick="copyToClipboard()" style="display: none;">
+            <img src="https://www.svgrepo.com/show/309480/copy.svg" alt="Copy to Clipboard" width="20" height="20">
+        </button>
+    </div>
+
+    <script>
+        async function findVariants() {
+            const shopifyLink = document.getElementById("shopifyLink").value;
+
+            try {
+                const response = await axios.get(`${shopifyLink}.json`);
+                const product = response.data.product;
+                const variants = product.variants;
+
+                if (variants && variants.length > 0) {
+                    let result = "";
+
+                    variants.forEach((variant) => {
+                        const size = variant.title;
+                        const variantId = variant.id;
+
+                        result += `${size} - ${variantId}\n`;
+                    });
+
+                    const variantResult = document.getElementById("variantResult");
+                    variantResult.innerText = result;
+
+                    // Show the copy button
+                    const copyButton = document.getElementById("copyButton");
+                    copyButton.style.display = "block";
+                } else {
+                    const variantResult = document.getElementById("variantResult");
+                    variantResult.innerText = "No variants found";
+
+                    // Hide the copy button when there are no variants
+                    const copyButton = document.getElementById("copyButton");
+                    copyButton.style.display = "none";
+                }
+            } catch (error) {
+                const variantResult = document.getElementById("variantResult");
+                variantResult.innerText = "Error: There was an issue fetching data from the Shopify API.";
+
+                // Hide the copy button in case of an error
+                const copyButton = document.getElementById("copyButton");
+                copyButton.style.display = "none";
+            }
+        }
+
+        function copyToClipboard() {
+            const variantResult = document.getElementById("variantResult");
+            const textArea = document.createElement("textarea");
+            textArea.value = variantResult.innerText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+
+            // Update the copy button text
+            const copyButton = document.getElementById("copyButton");
+            copyButton.innerText = "Copied!";
+            setTimeout(() => {
+                copyButton.innerText = "Copy to Clipboard";
+            }, 2000);
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</body>
+</html>
