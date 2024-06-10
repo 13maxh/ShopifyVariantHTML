@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolve IO | Variant Finder</title>
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/2jGYNTdt/Transparent-Logo.png">
+    <style>
+        /* CSS styles for formatting */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative; /* Added for positioning the copy button */
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .result {
+            font-size: 16px;
+            white-space: pre-line;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .variants-box {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            max-height: 200px; /* Adjust the height according to your preference */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+        /* Specific styling for each variant box */
+        #cybersoleVariants,
+        #mekAIOVariants,
+        #valorAIOVariants,
+        #cheggAIOVariants,
+        #makeVariants {
+            max-height: 200px; /* Adjust the height according to your preference */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+        .logo {
+            max-width: 100px;
+            display: block;
+            margin: 0 auto;
+        }
+        #copyButton {
+            background-color: transparent;
+            color: #007bff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        .atc-all-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Popup styles */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fefefe;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 9999;
+    width: 400px; /* Adjust the width according to your preference */
+    text-align: center; /* Center the text within the popup */
+}
+
+.popup strong {
+    font-size: 24px; /* Adjust the font size for the strong (bold) elements */
+}
+
+.popup a {
+    font-size: 18px; /* Adjust the font size for the anchor (link) elements */
+}
+
+.popup p {
+    font-size: 20px; /* Adjust the font size for paragraph elements */
+}
+
+
+.popup img {
+    max-width: 100%;
+    height: auto;
+}
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="https://i.postimg.cc/2jGYNTdt/Transparent-Logo.png" alt="Shopify Variant Finder Logo" class="logo">
+    <h1 class="header">Evolve IO | Variant Finder</h1>
+    <div class="input-group">
+        <input type="text" id="variantLink" placeholder="Enter Product Link">
+        <button onclick="findVariants()">Find Variants</button>
+    </div>
+    <div class="result" id="variantResult"></div>
+    <div class="atc-all-link">
+        <a href="#" id="atcAllLink" style="display: none;" target="_blank">[ATC All]</a>
+    </div>
+    <div class="variants-box" id="cybersoleVariants"></div>
+    <div class="variants-box" id="mekAIOVariants"></div>
+    <div class="variants-box" id="valorAIOVariants"></div>
+    <div class="variants-box" id="cheggAIOVariants"></div>
+    <div class="variants-box" id="makeVariants"></div>
+    <button id="copyButton" onclick="copyToClipboard()" style="display: none;">
+        <img src="https://www.svgrepo.com/show/309480/copy.svg" alt="Copy to Clipboard" width="20" height="20">
+    </button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    async function findVariants() {
+        const variantLink = document.getElementById("variantLink").value;
+        const isSupreme = variantLink.includes('us.supreme.com') || variantLink.includes("travisscott") || variantLink.includes("denimtears");
+
+        try {
+            if (isSupreme) {
+                const response = await axios.get(variantLink);
+                const pageContent = response.data;
+                const parser = new DOMParser();
+                const htmlDocument = parser.parseFromString(pageContent, 'text/html');
+                const scriptElement = htmlDocument.getElementById('web-pixels-manager-setup');
+
+                if (scriptElement) {
+                    const scriptContent = scriptElement.innerHTML;
+                    const productVariantsIndex = scriptContent.indexOf('"productVariants"');
+                    const closingBracketIndex = scriptContent.indexOf(']', productVariantsIndex);
+                    const productVariantsJSON = scriptContent.substring(productVariantsIndex, closingBracketIndex + 1);
+                    const productVariants = JSON.parse('{' + productVariantsJSON + '}')['productVariants'];
+                    
+                    // Extract title of the product
+                    const titleElement = htmlDocument.querySelector('title');
+                    const productTitle = titleElement ? titleElement.textContent : 'Product Title Not Found';
+
+                    let result = `<h2>${productTitle}</h2><ul>`;
+                    productVariants.forEach(variant => {
+                        result += `<li>${variant.untranslatedTitle} - ${variant.id}</li>`;
+                    });
+                    result += '</ul>';
+
+                    const variantResult = document.getElementById("variantResult");
+                    variantResult.innerHTML = result;
+
+                    // Show the copy button
+                    const copyButton = document.getElementById("copyButton");
+                    copyButton.style.display = "block";
+
+                    // Show the "ATC All" link
+                    const atcAllLink = document.getElementById("atcAllLink");
+                    atcAllLink.style.display = "block";
+
+                    // Build the cartLink for Supreme
+                    let cartLink = "";
+                    productVariants.forEach((variant, index) => {
+                        cartLink += `${variant.id}:123456`;
+                        if (index < productVariants.length - 1) {
+                            cartLink += ',';
+                        }
+                    });
+                  
+                    let cybersoleVariants = [];
+                    let mekAIOVariants = [];
+                    let valorAIOVariants = [];
+                    let cheggAIOVariants = [];
+                    let makeVariants = [];
+
+                    productVariants.forEach((variant, index) => {
+                        const variantId = variant.id;
+
+                        cybersoleVariants.push(variantId);
+                        mekAIOVariants.push(variantId);
+                        valorAIOVariants.push(variantId);
+                        cheggAIOVariants.push(`${variant.untranslatedTitle}:${variantId}`);
+                        makeVariants.push(variantId);
+                    });
+
+                    document.getElementById("cybersoleVariants").innerText = `Cybersole Mass Variant Input: \n ${cybersoleVariants.join(',')}`;
+                    document.getElementById("mekAIOVariants").innerText = `Mek AIO Mass Variant Input: \n [${mekAIOVariants.join(',')}]`;
+                    document.getElementById("valorAIOVariants").innerText = `Valor AIO Mass Variant Input: \n var:${valorAIOVariants.join(',')}`;
+                    document.getElementById("cheggAIOVariants").innerText = `CheggAIO Mass Variant Input: \n ${cheggAIOVariants.join(', ')}`;
+                    document.getElementById("makeVariants").innerText = `Make Mass Variant Input: \n ${makeVariants.join('\n')}`;
+
+                    // Set the href for the "ATC All" link for Supreme
+                    let domain = variantLink.includes('us.supreme.com') ? 'us.supreme.com' : 'shop.travisscott.com';
+                    atcAllLink.href = `https://${domain}/cart/${cartLink}`;
+
+                } else {
+                    throw new Error("Script block with id 'web-pixels-manager-setup' not found.");
+                }
+            } else {
+                const response = await axios.get(`${variantLink}.json`);
+                const product = response.data.product;
+                const variants = product.variants;
+
+                if (variants && variants.length > 0) {
+                    let cartLink = "/cart/";
+                    let variantInfo = "";
+                    let totalStock = 0;
+                    const includeStock = variantLink.includes("shoepalace") || variantLink.includes("onenessboutique");
+
+                    variants.forEach((variant, index) => {
+                        const variantId = variant.id;
+                        const variantName = variant.title;
+                        let stockInfo = "";
+
+                        if (includeStock) {
+                            const stock = Math.abs(variant.inventory_quantity);
+                            stockInfo = ` - Stock: ${stock}`;
+                            totalStock += stock;
+                        }
+
+                        variantInfo += `${variant.title} - ${variantId}${stockInfo}\n`;
+
+                        const copyButton = document.getElementById("copyButton");
+                        copyButton.style.display = "block";
+
+                        cartLink += `${variantId}:123456`;
+
+                        if (index < variants.length - 1) {
+                            cartLink += ',';
+                        }
+                    });
+
+                    const atcAllLink = document.getElementById("atcAllLink");
+                    atcAllLink.style.display = "block";
+                    atcAllLink.href = `https://${variantLink.split('/')[2]}${cartLink}`;
+
+                    const variantResult = document.getElementById("variantResult");
+                    variantResult.innerText = `${variantInfo}\n${includeStock ? `Total Stock: ${totalStock}` : ''}`;
+
+                    let cybersoleVariants = [];
+                    let mekAIOVariants = [];
+                    let valorAIOVariants = [];
+                    let cheggAIOVariants = [];
+                    let makeVariants = [];
+
+                    variants.forEach((variant, index) => {
+                        const variantId = variant.id;
+
+                        cybersoleVariants.push(variantId);
+                        mekAIOVariants.push(variantId);
+                        valorAIOVariants.push(variantId);
+                        cheggAIOVariants.push(`${variant.title}:${variantId}`);
+                        makeVariants.push(variantId);
+                    });
+
+                    document.getElementById("cybersoleVariants").innerText = `Cybersole Mass Variant Input: \n ${cybersoleVariants.join(',')}`;
+                    document.getElementById("mekAIOVariants").innerText = `Mek AIO Mass Variant Input: \n [${mekAIOVariants.join(',')}]`;
+                    document.getElementById("valorAIOVariants").innerText = `Valor AIO Mass Variant Input: \n var:${valorAIOVariants.join(',')}`;
+                    document.getElementById("cheggAIOVariants").innerText = `CheggAIO Mass Variant Input: \n ${cheggAIOVariants.join(', ')}`;
+                    document.getElementById("makeVariants").innerText = `Make Mass Variant Input: \n ${makeVariants.join('\n')}`;
+            } else if (isNocta) {
+                const response = await axios.get(variantLink);
+                const pageContent = response.data;
+
+                // Parsing the stock information
+                const inventoryRegex = /"inventory":\s*"(\d+)"/g;
+                let stockInfo = "";
+                let match;
+                while ((match = inventoryRegex.exec(pageContent)) !== null) {
+                    stockInfo += `Inventory: ${match[1]}\n`;
+                }
+
+                // Display stock information
+                const variantResult = document.getElementById("variantResult");
+                variantResult.innerText = stockInfo;
+
+                // Hide unnecessary elements
+                const copyButton = document.getElementById("copyButton");
+                copyButton.style.display = "none";
+                } else {
+                    const variantResult = document.getElementById("variantResult");
+                    variantResult.innerText = "No variants found";
+
+                    const copyButton = document.getElementById("copyButton");
+                    copyButton.style.display = "none";
+
+                    const atcAllLink = document.getElementById("atcAllLink");
+                    atcAllLink.style.display = "none";
+                }
+            }
+        } catch (error) {
+            const variantResult = document.getElementById("variantResult");
+            variantResult.innerText = "Error: There was an issue fetching data.";
+
+            document.getElementById("cybersoleVariants").innerText = "";
+            document.getElementById("mekAIOVariants").innerText = "";
+            document.getElementById("valorAIOVariants").innerText = "";
+            document.getElementById("cheggAIOVariants").innerText = "";
+            document.getElementById("makeVariants").innerText = "";
+
+            const copyButton = document.getElementById("copyButton");
+            copyButton.style.display = "none";
+
+            const atcAllLink = document.getElementById("atcAllLink");
+            atcAllLink.style.display = "none";
+        }
+    }
+
+    function copyToClipboard() {
+        const variantResult = document.getElementById("variantResult");
+        const textArea = document.createElement("textarea");
+        textArea.value = variantResult.innerText;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        const copyButton = document.getElementById("copyButton");
+        copyButton.innerText = "Copied!";
+        setTimeout(() => {
+            copyButton.innerText = "Copy to Clipboard";
+        }, 2000);
+    }
+
+</script>
+</body>
+</html>
