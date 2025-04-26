@@ -62,9 +62,7 @@
         }
         /* Specific styling for each variant box */
         #cybersoleVariants,
-        #mekAIOVariants,
         #valorAIOVariants,
-        #cheggAIOVariants,
         #makeVariants {
             max-height: 200px; /* Adjust the height according to your preference */
             overflow-y: auto; /* Enable vertical scrolling */
@@ -151,9 +149,7 @@
         <a href="#" id="atcAllLink" style="display: none;" target="_blank">[ATC All]</a>
     </div>
     <div class="variants-box" id="cybersoleVariants"></div>
-    <div class="variants-box" id="mekAIOVariants"></div>
     <div class="variants-box" id="valorAIOVariants"></div>
-    <div class="variants-box" id="cheggAIOVariants"></div>
     <div class="variants-box" id="makeVariants"></div>
     <button id="copyButton" onclick="copyToClipboard()" style="display: none;">
         <img src="https://www.svgrepo.com/show/309480/copy.svg" alt="Copy to Clipboard" width="20" height="20">
@@ -211,26 +207,20 @@
                     });
                   
                     let cybersoleVariants = [];
-                    let mekAIOVariants = [];
                     let valorAIOVariants = [];
-                    let cheggAIOVariants = [];
                     let makeVariants = [];
 
                     productVariants.forEach((variant, index) => {
                         const variantId = variant.id;
 
                         cybersoleVariants.push(variantId);
-                        mekAIOVariants.push(variantId);
                         valorAIOVariants.push(variantId);
-                        cheggAIOVariants.push(`${variant.untranslatedTitle}:${variantId}`);
                         makeVariants.push(variantId);
                     });
 
                     document.getElementById("cybersoleVariants").innerText = `Cybersole Mass Variant Input: \n ${cybersoleVariants.join(',')}`;
-                    document.getElementById("mekAIOVariants").innerText = `Mek AIO Mass Variant Input: \n [${mekAIOVariants.join(',')}]`;
                     document.getElementById("valorAIOVariants").innerText = `Valor AIO Mass Variant Input: \n var:${valorAIOVariants.join(',')}`;
-                    document.getElementById("cheggAIOVariants").innerText = `CheggAIO Mass Variant Input: \n ${cheggAIOVariants.join(', ')}`;
-                    document.getElementById("makeVariants").innerText = `Make Mass Variant Input: \n ${makeVariants.join('\n')}`;
+                    document.getElementById("makeVariants").innerText = `Make Mass Variant Input: \n ${makeVariants.join(' ')}`;
 
                     // Set the href for the "ATC All" link for Supreme
                     let domain = variantLink.includes('us.supreme.com') ? 'us.supreme.com' : 'shop.travisscott.com';
@@ -281,26 +271,20 @@
                     variantResult.innerText = `${variantInfo}\n${includeStock ? `Total Stock: ${totalStock}` : ''}`;
 
                     let cybersoleVariants = [];
-                    let mekAIOVariants = [];
                     let valorAIOVariants = [];
-                    let cheggAIOVariants = [];
                     let makeVariants = [];
 
                     variants.forEach((variant, index) => {
                         const variantId = variant.id;
 
                         cybersoleVariants.push(variantId);
-                        mekAIOVariants.push(variantId);
                         valorAIOVariants.push(variantId);
-                        cheggAIOVariants.push(`${variant.title}:${variantId}`);
                         makeVariants.push(variantId);
                     });
 
                     document.getElementById("cybersoleVariants").innerText = `Cybersole Mass Variant Input: \n ${cybersoleVariants.join(',')}`;
-                    document.getElementById("mekAIOVariants").innerText = `Mek AIO Mass Variant Input: \n [${mekAIOVariants.join(',')}]`;
                     document.getElementById("valorAIOVariants").innerText = `Valor AIO Mass Variant Input: \n var:${valorAIOVariants.join(',')}`;
-                    document.getElementById("cheggAIOVariants").innerText = `CheggAIO Mass Variant Input: \n ${cheggAIOVariants.join(', ')}`;
-                    document.getElementById("makeVariants").innerText = `Make Mass Variant Input: \n ${makeVariants.join('\n')}`;
+                    document.getElementById("makeVariants").innerText = `Make Mass Variant Input: \n ${makeVariants.join(' ')}`;
             } else if (isNocta) {
                 const response = await axios.get(variantLink);
                 const pageContent = response.data;
@@ -336,9 +320,7 @@
             variantResult.innerText = "Error: There was an issue fetching data.";
 
             document.getElementById("cybersoleVariants").innerText = "";
-            document.getElementById("mekAIOVariants").innerText = "";
             document.getElementById("valorAIOVariants").innerText = "";
-            document.getElementById("cheggAIOVariants").innerText = "";
             document.getElementById("makeVariants").innerText = "";
 
             const copyButton = document.getElementById("copyButton");
